@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /*
 |--------------------------------------------------------------------------
 | Routes
@@ -20,7 +21,7 @@
 
 import Route from '@ioc:Adonis/Core/Route'
 import './Auth'
-import './Register'
+import './Users'
 
 Route.get('/', async () => {
   return { hello: 'world' }

@@ -22,8 +22,6 @@ export class UploadImage {
       return await Drive.getUrl(`${location}/${fileName}`);
     }
 
-    // await file.moveToDisk(location, { name: fileName });
-
     await file.move(Application.tmpPath('avatars'), {
       name: fileName,
       overwrite: true

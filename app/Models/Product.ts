@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
+import File from './File'
 
 export default class Product extends BaseModel {
   @column({ isPrimary: true })
@@ -23,6 +24,12 @@ export default class Product extends BaseModel {
 
   @belongsTo(() => User)
   public user: BelongsTo<typeof User>
+
+  @hasMany(() => File, {
+    foreignKey: 'ownerId',
+    onQuery: (query) => query.where({ fileCategory: 'product_image' }),
+  })
+  public files: HasMany<typeof File>
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

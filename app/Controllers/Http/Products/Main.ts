@@ -1,21 +1,58 @@
+/* eslint-disable prettier/prettier */
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Product from 'App/Models/Product'
+import Database from '@ioc:Adonis/Lucid/Database'
 import StoreValidator from 'App/Validators/Products/Main/StoreValidator'
 import UpdateValidator from 'App/Validators/Products/Main/UpdateValidator'
+import { ProductImageFactory } from 'App/Factories/upload/productImage'
+import { faker } from '@faker-js/faker'
 
 export default class ProductsController {
-  public async index({}: HttpContextContract) {
+  public async index({ }: HttpContextContract) {
     return Product.all()
   }
 
   public async store({ auth, request, response }: HttpContextContract) {
-    const user = auth.user!
+    await Database.transaction(async (trx) => {
+      const user = auth.user!
 
-    const data = await request.validate(StoreValidator)
+      user.useTransaction(trx)
 
-    await user.related('products').create(data)
+      const { description, discount, price, title, images } = await request.validate(StoreValidator)
 
-    return response.status(200)
+      // crate product
+
+      const product = await user.related('products').create({
+        description: description,
+        discount: discount,
+        price: price,
+        title: title
+      })
+
+      // save product images in files table, in aws and in local paste
+
+      return await Promise.all(
+        images.map(async (image, index) => {
+
+          const imageId = faker.string.uuid()
+
+          const saveImage = await product.related('files').create({
+            fileCategory: 'product_image',
+            fileName: `${imageId}.${image.extname}`
+          })
+          await saveImage.save()
+
+          const ProductImageUseCase = ProductImageFactory();
+
+          const imageUrl = await ProductImageUseCase.execute(image, imageId);
+
+          return imageUrl
+
+        })
+      )
+
+    })
+
   }
 
   public async show({ params }: HttpContextContract) {

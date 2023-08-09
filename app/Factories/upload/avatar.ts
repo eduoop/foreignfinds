@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { UploadImage } from "App/Services/UploadImage";
+import { UploadAvatar } from "App/Services/UploadAvatar";
 import { AvatarUseCase } from "App/UseCases/Upload/avatar";
 
 export function AvatarFactory(): AvatarUseCase {
-  const uploadImage = new UploadImage();
+  const uploadImage = new UploadAvatar();
   const useCase = new AvatarUseCase(uploadImage);
 
   return useCase;

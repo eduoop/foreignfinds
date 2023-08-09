@@ -3,7 +3,7 @@ import type { MultipartFileContract } from "@ioc:Adonis/Core/BodyParser";
 import Drive from "@ioc:Adonis/Core/Drive";
 import Application from '@ioc:Adonis/Core/Application'
 
-export class UploadImage {
+export class UploadProductImage {
   public async uploadProfileImage(
     image: MultipartFileContract,
     filename: string

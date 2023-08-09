@@ -23,7 +23,6 @@ import Route from '@ioc:Adonis/Core/Route'
 import './Auth'
 import './Users'
 import './Products'
-import './TestAws'
 
 Route.get('/', async () => {
   return { hello: 'world' }

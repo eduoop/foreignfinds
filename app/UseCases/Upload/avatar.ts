@@ -7,8 +7,8 @@ import { randomUUID } from "crypto";
 export class AvatarUseCase {
   constructor(private uploadImage: UploadImage) {}
 
-  async execute(image: MultipartFileContract): Promise<string> {
+  async execute(image: MultipartFileContract, userId: string): Promise<string> {
     const filename = randomUUID();
-    return await this.uploadImage.uploadProfileImage(image, filename);
+    return await this.uploadImage.uploadProfileImage(image, userId);
   }
 }

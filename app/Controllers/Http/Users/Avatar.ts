@@ -22,7 +22,7 @@ export default class UserAvatarController {
 
             const avatarUseCase = AvatarFactory();
 
-            const imageUrl = await avatarUseCase.execute(file);
+            const imageUrl = await avatarUseCase.execute(file, JSON.stringify(user.id));
 
             return response.ok({ imageUrl });
         })

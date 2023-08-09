@@ -24,7 +24,7 @@ export class UploadImage {
 
     // await file.moveToDisk(location, { name: fileName });
 
-    await file.move(Application.tmpPath('uploads/avatars'), {
+    await file.move(Application.tmpPath('avatars'), {
       name: fileName,
       overwrite: true
     })

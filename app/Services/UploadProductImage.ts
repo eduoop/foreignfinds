@@ -8,7 +8,7 @@ export class UploadProductImage {
     image: MultipartFileContract,
     filename: string
   ): Promise<string> {
-    const location = "avatars";
+    const location = "productsImages";
     return await this.uploadFileToDrive(image, location, `${filename}.png`);
   }
 
@@ -22,7 +22,7 @@ export class UploadProductImage {
       return await Drive.getUrl(`${location}/${fileName}`);
     }
 
-    await file.move(Application.tmpPath('avatars'), {
+    await file.move(Application.tmpPath('productsImages'), {
       name: fileName,
       overwrite: true
     })

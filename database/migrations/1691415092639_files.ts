@@ -9,7 +9,7 @@ export default class extends BaseSchema {
       table.increments('id')
       table.enu('file_category', ["avatar", "product_image"]).notNullable()
       table.integer('owner_id').notNullable()
-      table.string('file_name').notNullable()
+      table.string('file_name').notNullable().unique()
     })
   }
 

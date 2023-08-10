@@ -2,6 +2,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database'
 import type { MultipartFileContract } from "@ioc:Adonis/Core/BodyParser";
+import Drive from "@ioc:Adonis/Core/Drive";
 import { AvatarFactory } from 'App/Factories/upload/avatar';
 
 export default class UserAvatarController {
@@ -23,6 +24,23 @@ export default class UserAvatarController {
             const avatarUseCase = AvatarFactory();
 
             const imageUrl = await avatarUseCase.execute(file, JSON.stringify(user.id));
+
+            const sharp = require('sharp');
+
+            const imagemBuffer = await sharp({
+                create: {
+                    width: 300,
+                    height: 200,
+                    channels: 3,
+                    background: { r: 255, g: 0, b: 0 }
+                }
+            })
+                .toBuffer();
+
+            if (imagemBuffer) {
+                await Drive.put(`avatars/${file.fileName}`, imagemBuffer);
+                return 'Imagem salva com sucesso na AWS S3!';
+            }
 
             return response.ok({ imageUrl });
         })

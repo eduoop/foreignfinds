@@ -31,14 +31,14 @@ export default class ProductsController {
 
       // save product images in files table, in aws and in local paste
 
-      return await Promise.all(
+      await Promise.all(
         images.map(async (image, index) => {
 
           const imageId = faker.string.uuid()
 
           const saveImage = await product.related('files').create({
             fileCategory: 'product_image',
-            fileName: `${imageId}.${image.extname}`
+            fileName: `${imageId}.${image.extname}`,
           })
           await saveImage.save()
 
@@ -47,10 +47,10 @@ export default class ProductsController {
           const imageUrl = await ProductImageUseCase.execute(image, imageId);
 
           return imageUrl
-
         })
       )
 
+      return response.status(200)
     })
 
   }

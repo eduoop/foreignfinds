@@ -9,7 +9,7 @@ export class UploadAvatar {
     filename: string
   ): Promise<string> {
     const location = "avatars";
-    return await this.uploadFileToDrive(image, location, `${filename}.png`);
+    return await this.uploadFileToDrive(image, location, `${filename}.${image.extname}`);
   }
 
   private async uploadFileToDrive(

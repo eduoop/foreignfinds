@@ -29,8 +29,6 @@ export default class MainsController {
 
             const link = `${redirectUrl.replace(/\/$/, '')}/${key}`
 
-            console.log(key)
-
             await Mail.send((message) => {
                 message.to(email)
                 message.from('contato@taxIr.com', 'taxIr')

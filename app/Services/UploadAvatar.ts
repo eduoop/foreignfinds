@@ -18,14 +18,27 @@ export class UploadAvatar {
     fileName: string
   ): Promise<string> {
     if (isBuffer(file)) {
-      await Drive.put(`${location}/${fileName}`, file);
+      await Drive.put(`${location}/${fileName}`, file, {
+        visibility: 'public',
+        contentType: 'image'
+      });
       return await Drive.getUrl(`${location}/${fileName}`);
     }
+
+    const fs = require('fs');
 
     await file.move(Application.tmpPath('avatars'), {
       name: fileName,
       overwrite: true
     })
+
+    const imagePath = Application.tmpPath(`${location}/${fileName}`)
+    const imageBuffer = await fs.promises.readFile(imagePath);
+
+    await Drive.put(`${location}/${fileName}`, imageBuffer, {
+      visibility: 'public',
+      contentType: 'image',
+    });
 
     return await Drive.getUrl(`${location}/${fileName}`);
   }

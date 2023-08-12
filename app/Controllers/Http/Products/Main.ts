@@ -6,10 +6,14 @@ import StoreValidator from 'App/Validators/Products/Main/StoreValidator'
 import UpdateValidator from 'App/Validators/Products/Main/UpdateValidator'
 import { ProductImageFactory } from 'App/Factories/upload/productImage'
 import { faker } from '@faker-js/faker'
+import File from 'App/Models/File'
+import deleteProductImages from 'App/Utils/Functions/deleteProductImages';
 
 export default class ProductsController {
   public async index({ }: HttpContextContract) {
-    return Product.all()
+    const allProducts = await Product.all()
+
+    return allProducts
   }
 
   public async store({ auth, request, response }: HttpContextContract) {
@@ -31,20 +35,25 @@ export default class ProductsController {
 
       // save product images in files table, in aws and in local paste
 
+      if (images.length > 5) {
+        return response.unauthorized("you only have 5 images")
+      }
+
       await Promise.all(
-        images.map(async (image, index) => {
+        images.map(async (image) => {
 
           const imageId = faker.string.uuid()
-
-          const saveImage = await product.related('files').create({
-            fileCategory: 'product_image',
-            fileName: `${imageId}.${image.extname}`,
-          })
-          await saveImage.save()
 
           const ProductImageUseCase = ProductImageFactory();
 
           const imageUrl = await ProductImageUseCase.execute(image, imageId);
+
+          const saveImage = await product.related('files').create({
+            fileCategory: 'product_image',
+            fileName: `${imageId}.${image.extname}`,
+            fileUrl: imageUrl
+          })
+          await saveImage.save()
 
           return imageUrl
         })
@@ -56,7 +65,9 @@ export default class ProductsController {
   }
 
   public async show({ params }: HttpContextContract) {
-    const product = await Product.findByOrFail('id', params.id)
+    const product = await Product.query().where('id', params.id).firstOrFail()
+
+    await product.load('files')
 
     return product
   }
@@ -66,13 +77,64 @@ export default class ProductsController {
 
     const loggedUser = auth.user!
 
-    const data = await request.validate(UpdateValidator)
+    const fs = require('fs/promises');
+
+    const { description, discount, price, title, images, imagesDelete } = await request.validate(UpdateValidator)
 
     if (product.userId !== loggedUser.id && loggedUser.role !== 'admin') {
       return response.unauthorized()
     }
 
-    await product.merge(data).save()
+    await product.merge({
+      description: description,
+      discount: discount,
+      title: title,
+      price: price,
+    }).save()
+
+    // save product images in files table, in aws and in local paste
+
+    const productExistsImages = await product.related('files').query()
+
+    if (productExistsImages.length + images.length > 5) {
+      return response.unauthorized("you only have 5 images")
+    }
+
+    await Promise.all(
+      images.map(async (image) => {
+        if (image) {
+          const imageId = faker.string.uuid()
+
+          const ProductImageUseCase = ProductImageFactory();
+
+          const imageUrl = await ProductImageUseCase.execute(image, imageId);
+
+          const saveImage = await product.related('files').create({
+            fileCategory: 'product_image',
+            fileName: `${imageId}.${image.extname}`,
+            fileUrl: imageUrl
+          })
+
+          await saveImage.save()
+
+          return imageUrl
+        }
+      })
+    )
+
+    // delete products images
+
+    const local = "productsImages"
+
+    const filteredImagesDelete = imagesDelete.map((image) => {
+      return image !== null && image !== undefined && image
+    })
+
+    
+    if (filteredImagesDelete) {
+      const images = await File.query().whereIn('file_name', filteredImagesDelete).andWhere('owner_id', product.id)
+      await deleteProductImages({ images: images, local: local })
+    }
 
     return response.status(200)
   }
@@ -80,10 +142,20 @@ export default class ProductsController {
   public async destroy({ params, auth, response }: HttpContextContract) {
     const product = await Product.findByOrFail('id', params.id)
 
+    const local = "productsImages"
+
+    const fs = require('fs/promises');
+
+    const productImages = await product.related('files').query()
+
+    await deleteProductImages({ images: productImages, local: local })
+
     const loggedUser = auth.user!
 
     if (product.userId !== loggedUser.id && loggedUser.role !== 'admin') {
       return response.unauthorized()
     }
+
+    return response.status(200)
   }
 }

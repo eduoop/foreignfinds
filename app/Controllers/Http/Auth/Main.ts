@@ -7,9 +7,11 @@ export default class AuthController {
 
     const token = await auth.attempt(email, password)
 
-    console.log(email, password)
+    const user = auth.user!
 
-    return { token: token, user: auth.user }
+    await user.load('avatar')
+
+    return { token: token, user: user }
   }
 
   public async destroy({ auth }: HttpContextContract) {

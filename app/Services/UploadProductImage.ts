@@ -9,7 +9,7 @@ export class UploadProductImage {
     filename: string
   ): Promise<string> {
     const location = "productsImages";
-    return await this.uploadFileToDrive(image, location, `${filename}.png`);
+    return await this.uploadFileToDrive(image, location, `${filename}.${image.extname}`);
   }
 
   private async uploadFileToDrive(
@@ -22,10 +22,20 @@ export class UploadProductImage {
       return await Drive.getUrl(`${location}/${fileName}`);
     }
 
-    await file.move(Application.tmpPath('productsImages'), {
+    const fs = require('fs');
+
+    await file.move(Application.tmpPath(location), {
       name: fileName,
       overwrite: true
     })
+
+    const imagePath = Application.tmpPath(`${location}/${fileName}`)
+    const imageBuffer = await fs.promises.readFile(imagePath);
+
+    await Drive.put(`${location}/${fileName}`, imageBuffer, {
+      visibility: 'public',
+      contentType: 'image'
+    });
 
     return await Drive.getUrl(`${location}/${fileName}`);
   }

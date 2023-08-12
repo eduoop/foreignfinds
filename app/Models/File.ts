@@ -12,4 +12,7 @@ export default class File extends BaseModel {
 
   @column()
   public ownerId: number
+
+  @column()
+  public fileUrl: string
 }

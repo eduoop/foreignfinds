@@ -77,8 +77,6 @@ export default class ProductsController {
 
     const loggedUser = auth.user!
 
-    const fs = require('fs/promises');
-
     const { description, discount, price, title, images, imagesDelete } = await request.validate(UpdateValidator)
 
     if (product.userId !== loggedUser.id && loggedUser.role !== 'admin') {
@@ -143,8 +141,6 @@ export default class ProductsController {
     const product = await Product.findByOrFail('id', params.id)
 
     const local = "productsImages"
-
-    const fs = require('fs/promises');
 
     const productImages = await product.related('files').query()
 

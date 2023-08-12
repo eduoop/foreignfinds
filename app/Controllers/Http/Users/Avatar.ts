@@ -32,17 +32,14 @@ export default class UserAvatarController {
 
                         const imageInLocal = await Application.tmpPath(`${local}/${avatar.ownerId}.${imageExtname}`)
 
-                        fs.unlink(imageInLocal, (err) => {
-                            if (err) {
-                                console.error('Ocorreu um erro ao excluir o arquivo:', err);
-                            } else {
-                                console.log('Arquivo excluído com sucesso!');
-                            }
-                        })
+                        if (imageInLocal) {
+                            fs.unlink(imageInLocal)
+                        }
+
 
                         // delete from db
                         await avatar.delete()
-                        
+
                         // delete from aws
 
                         await Drive.delete(`${local}/${avatar.ownerId}.${imageExtname}`)

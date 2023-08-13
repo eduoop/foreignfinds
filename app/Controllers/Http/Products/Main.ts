@@ -11,7 +11,7 @@ import deleteProductImages from 'App/Utils/Functions/deleteProductImages';
 
 export default class ProductsController {
   public async index({ }: HttpContextContract) {
-    const allProducts = await Product.all()
+    const allProducts = await Product.query().preload('files')
 
     return allProducts
   }

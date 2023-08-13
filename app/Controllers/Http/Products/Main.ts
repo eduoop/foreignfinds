@@ -10,8 +10,13 @@ import File from 'App/Models/File'
 import deleteProductImages from 'App/Utils/Functions/deleteProductImages';
 
 export default class ProductsController {
-  public async index({ }: HttpContextContract) {
-    const allProducts = await Product.query().preload('files')
+  public async index({request}: HttpContextContract) {
+
+    const { search } = await request.qs();
+
+    const allProducts = await Product.query().preload('files').if(search, (query) => {
+      query.where('title', "like", `%${search}%`)
+    })
 
     return allProducts
   }

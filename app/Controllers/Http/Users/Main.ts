@@ -12,6 +12,8 @@ export default class UsersController {
     const { name, password, phone, surname } = await request.validate(UpdateValidator)
     const user = await User.findByOrFail("id", params.id)
     await user.merge({ name, password, phone, surname })
-    user.save()
+    await user.save()
+
+    return user
   }
 }

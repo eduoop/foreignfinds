@@ -53,7 +53,9 @@ export default class MainsController {
 
         const user = await userKey.related('user').query().firstOrFail()
 
-        user.merge({ name, password, phone })
+        const userSurname = user.name.split(' ')[0] ? user.name.split(' ')[0] : user.name
+
+        user.merge({ name: name, password: password, phone: phone, surname: userSurname})
 
         await user.save()
 

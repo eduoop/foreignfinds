@@ -26,6 +26,9 @@ export default class User extends BaseModel {
   public role: string
 
   @column()
+  public surname: string
+
+  @column()
   public rememberMeToken: string | null
 
   @hasMany(() => UserKey)

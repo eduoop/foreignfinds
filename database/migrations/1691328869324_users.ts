@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import BaseSchema from '@ioc:Adonis/Lucid/Schema'
 
 export default class extends BaseSchema {
@@ -12,6 +13,7 @@ export default class extends BaseSchema {
       table.string('phone', 20)
       table.enum('role', ['admin', 'user']).notNullable()
       table.string('remember_me_token').nullable()
+      table.string('surname').nullable()
 
       table.timestamp('created_at', { useTz: true }).notNullable()
       table.timestamp('updated_at', { useTz: true }).notNullable()

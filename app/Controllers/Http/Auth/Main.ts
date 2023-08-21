@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import StoreValidator from 'App/Validators/Auth/StoreValidator'
 
@@ -11,7 +12,19 @@ export default class AuthController {
 
     await user.load('avatar')
 
-    return { token: token, user: user }
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        token: token.token,
+        phone: user.phone,
+        surname: user.surname,
+        created_at: user.createdAt,
+        updated_at: user.updatedAt,
+        avatar: user.avatar
+      }
+    }
   }
 
   public async destroy({ auth }: HttpContextContract) {

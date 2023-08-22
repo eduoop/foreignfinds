@@ -14,6 +14,17 @@ export default class UsersController {
     await user.merge({ name, password, phone, surname })
     await user.save()
 
-    return user
+    return {
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        surname: user.surname,
+        created_at: user.createdAt,
+        updated_at: user.updatedAt,
+        avatar: user.avatar
+      }
+    }
   }
 }

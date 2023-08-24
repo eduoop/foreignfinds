@@ -8,7 +8,7 @@ import UserKey from 'App/Models/UserKey'
 import StoreValidator from 'App/Validators/User/Register/StoreValidator'
 import UpdateValidator from 'App/Validators/User/Register/UpdateValidator'
 
-export default class MainsController {
+export default class UserRegister {
     public async store({ request }: HttpContextContract) {
         await Database.transaction(async (trx) => {
             const { email, redirectUrl, role } = await request.validate(StoreValidator)

@@ -5,6 +5,7 @@ import type { MultipartFileContract } from "@ioc:Adonis/Core/BodyParser";
 import Application from '@ioc:Adonis/Core/Application'
 import Drive from "@ioc:Adonis/Core/Drive";
 import { AvatarFactory } from 'App/Factories/upload/avatar';
+import { faker } from '@faker-js/faker';
 
 export default class UserAvatarController {
     public async update({ request, auth, response }: HttpContextContract) {
@@ -30,7 +31,7 @@ export default class UserAvatarController {
 
                         const imageExtname = avatar.fileName.split(".")[1]
 
-                        const imageInLocal = await Application.tmpPath(`${local}/${avatar.ownerId}.${imageExtname}`)
+                        const imageInLocal = await Application.tmpPath(`${local}/${avatar.fileName}`)
 
                         if (imageInLocal) {
                             fs.unlink(imageInLocal)
@@ -42,20 +43,22 @@ export default class UserAvatarController {
 
                         // delete from aws
 
-                        await Drive.delete(`${local}/${avatar.ownerId}.${imageExtname}`)
+                        await Drive.delete(`${local}/${avatar.fileName}`)
                     })
                 )
             }
+
+            const fileId = faker.string.uuid()
 
             const searchPayload = {}
 
             const avatarUseCase = AvatarFactory();
 
-            const imageUrl = await avatarUseCase.execute(file, JSON.stringify(user.id));
+            const imageUrl = await avatarUseCase.execute(file, fileId);
 
             const savePayload = {
                 fileCategory: 'avatar' as any,
-                fileName: `${new Date().getTime()}.${file.extname}`,
+                fileName: `${fileId}.${file.extname}`,
                 fileUrl: imageUrl as any
             }
 

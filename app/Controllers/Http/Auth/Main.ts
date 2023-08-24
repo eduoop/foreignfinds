@@ -13,17 +13,8 @@ export default class AuthController {
     await user.load('avatar')
 
     return {
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        token: token.token,
-        phone: user.phone,
-        surname: user.surname,
-        created_at: user.createdAt,
-        updated_at: user.updatedAt,
-        avatar: user.avatar
-      }
+      user: user,
+      token: token
     }
   }
 

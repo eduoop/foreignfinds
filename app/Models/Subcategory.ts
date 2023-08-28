@@ -1,17 +1,20 @@
 import { DateTime } from 'luxon'
-import { BaseModel, HasMany, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
-import Subcategory from './Subcategory'
+import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import ProductCategory from './ProductCategory'
 import Product from './Product'
 
-export default class ProductCategory extends BaseModel {
+export default class Subcategory extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
   @column()
   public name: string
 
-  @hasMany(() => Subcategory)
-  public subcategories: HasMany<typeof Subcategory>
+  @column()
+  public productCategoryId: number
+
+  @belongsTo(() => ProductCategory, { foreignKey: 'productCategoryId' })
+  public productCategory: BelongsTo<typeof ProductCategory>
 
   @hasMany(() => Product)
   public products: HasMany<typeof Product>

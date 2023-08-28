@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { schema, CustomMessages } from '@ioc:Adonis/Core/Validator'
+import { schema, CustomMessages, rules } from '@ioc:Adonis/Core/Validator'
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
 export default class UpdateValidator {
@@ -7,7 +7,7 @@ export default class UpdateValidator {
 
   public schema = schema.create({
     title: schema.string({ trim: true }),
-    price: schema.number(),
+    price: schema.string({ trim: true }),
     discount: schema.number.optional(),
     description: schema.string({ trim: true }),
     images: schema.array().members(schema.file.optional({
@@ -27,7 +27,9 @@ export default class UpdateValidator {
         'WEBP',
       ],
     })),
-    imagesDelete: schema.array().members(schema.string.optional())
+    imagesDelete: schema.array().members(schema.string.optional()),
+    categoryId: schema.number([ rules.exists({ table: "product_categories", column: "id" })]),
+    subcategoryId: schema.number([ rules.exists({ table: "subcategories", column: "id" })])
   })
 
   public messages: CustomMessages = {}

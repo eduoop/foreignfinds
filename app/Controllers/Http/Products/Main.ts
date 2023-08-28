@@ -10,13 +10,13 @@ import File from 'App/Models/File'
 import deleteProductImages from 'App/Utils/Functions/deleteProductImages';
 
 export default class ProductsController {
-  public async index({request}: HttpContextContract) {
+  public async index({ request }: HttpContextContract) {
 
-    const { search } = await request.qs();
+    const { search } = request.qs();
 
-    const allProducts = await Product.query().preload('files').if(search, (query) => {
-      query.where('title', "like", `%${search}%`)
-    })
+    const allProducts = await Product.query().if(search, (query) => {
+      query.where('title', "ilike", `%${search}%`)
+    }).preload('files').preload("category").preload("subcategory")
 
     return allProducts
   }
@@ -27,15 +27,19 @@ export default class ProductsController {
 
       user.useTransaction(trx)
 
-      const { description, discount, price, title, images } = await request.validate(StoreValidator)
+      const { description, discount, price, title, images, categoryId, subcategoryId } = await request.validate(StoreValidator)
 
       // crate product
+
+      const numberPrice = Number(price)
 
       const product = await user.related('products').create({
         description: description,
         discount: discount,
-        price: price,
-        title: title
+        price: numberPrice,
+        title: title,
+        productCategoryId: categoryId,
+        subcategoryId: subcategoryId
       })
 
       // save product images in files table, in aws and in local paste
@@ -82,7 +86,9 @@ export default class ProductsController {
 
     const loggedUser = auth.user!
 
-    const { description, discount, price, title, images, imagesDelete } = await request.validate(UpdateValidator)
+    const { description, discount, price, title, images, imagesDelete, categoryId, subcategoryId } = await request.validate(UpdateValidator)
+
+    const numberPrice = Number(price)
 
     if (product.userId !== loggedUser.id && loggedUser.role !== 'admin') {
       return response.unauthorized()
@@ -92,7 +98,9 @@ export default class ProductsController {
       description: description,
       discount: discount,
       title: title,
-      price: price,
+      price: numberPrice,
+      productCategoryId: categoryId,
+      subcategoryId: subcategoryId
     }).save()
 
     // save product images in files table, in aws and in local paste
@@ -133,7 +141,7 @@ export default class ProductsController {
       return image !== null && image !== undefined && image
     })
 
-    
+
     if (filteredImagesDelete) {
       const images = await File.query().whereIn('file_name', filteredImagesDelete).andWhere('owner_id', product.id)
       await deleteProductImages({ images: images, local: local })

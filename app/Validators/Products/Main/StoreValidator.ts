@@ -10,7 +10,7 @@ export default class StoreValidator {
       table: 'products',
       column: 'title'
     })]),
-    price: schema.number(),
+    price: schema.string({ trim: true }),
     discount: schema.number.optional(),
     description: schema.string({ trim: true }),
     images: schema.array().members(schema.file({
@@ -29,7 +29,9 @@ export default class StoreValidator {
         'SVG',
         'WEBP',
       ],
-    }))
+    })),
+    categoryId: schema.number([ rules.exists({ table: "product_categories", column: "id" })]),
+    subcategoryId: schema.number([ rules.exists({ table: "subcategories", column: "id" })])
   })
 
   public messages: CustomMessages = {}

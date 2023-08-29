@@ -25,6 +25,9 @@ export default class Product extends BaseModel {
   public price: number
 
   @column()
+  public views: number
+
+  @column()
   public previousPrice: number
 
   @column()

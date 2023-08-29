@@ -76,6 +76,10 @@ export default class ProductsController {
   public async show({ params }: HttpContextContract) {
     const product = await Product.query().where('id', params.id).firstOrFail()
 
+    const productViews = product.views + 1;
+
+    product.views = productViews
+    await product.save()
     await product.load('files')
 
     return product

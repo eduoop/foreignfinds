@@ -9,6 +9,7 @@ export default class extends BaseSchema {
       table.string('title').notNullable()
       table.decimal('price').notNullable()
       table.decimal('previous_price').nullable()
+      table.integer('views').defaultTo(0)
       table.text('description', 'longtext').notNullable()
       table
         .integer('user_id')

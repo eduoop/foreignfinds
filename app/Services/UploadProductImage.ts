@@ -23,7 +23,7 @@ export class UploadProductImage {
       return await Drive.getUrl(`${location}/${fileName}`);
     }
 
-    const fs = require('fs');
+    // const fs = require('fs');
 
     await file.move(Application.tmpPath(location), {
       name: fileName,

@@ -25,7 +25,7 @@ export default class Product extends BaseModel {
   public price: number
 
   @column()
-  public discount: number
+  public previousPrice: number
 
   @column()
   public userId: number
@@ -41,9 +41,6 @@ export default class Product extends BaseModel {
 
   @belongsTo(() => User)
   public user: BelongsTo<typeof User>
-
-  @belongsTo(() => ProductCategory)
-  public category: BelongsTo<typeof ProductCategory>
 
   @belongsTo(() => Subcategory)
   public subcategory: BelongsTo<typeof Subcategory>

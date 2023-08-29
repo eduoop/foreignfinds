@@ -2,6 +2,7 @@
 import type { MultipartFileContract } from "@ioc:Adonis/Core/BodyParser";
 import Drive from "@ioc:Adonis/Core/Drive";
 import Application from '@ioc:Adonis/Core/Application'
+import sharp from "sharp";
 
 export class UploadProductImage {
   public async uploadProfileImage(
@@ -30,9 +31,16 @@ export class UploadProductImage {
     })
 
     const imagePath = Application.tmpPath(`${location}/${fileName}`)
-    const imageBuffer = await fs.promises.readFile(imagePath);
+    // const imageBuffer = await fs.promises.readFile(imagePath);
 
-    await Drive.put(`${location}/${fileName}`, imageBuffer, {
+    const resizedImage = await sharp(imagePath)
+      .resize({ width: 800 }) 
+      .jpeg({ quality: 80 })
+      .webp({ quality: 80 })
+      .png({ quality: 80 })
+      .toBuffer();
+
+    await Drive.put(`${location}/${fileName}`, resizedImage, {
       visibility: 'public',
       contentType: 'image'
     });

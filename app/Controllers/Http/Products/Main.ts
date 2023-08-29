@@ -16,7 +16,7 @@ export default class ProductsController {
 
     const allProducts = await Product.query().if(search, (query) => {
       query.where('title', "ilike", `%${search}%`)
-    }).preload('files').preload("category").preload("subcategory")
+    }).preload('files').preload("subcategory")
 
     return allProducts
   }
@@ -27,19 +27,19 @@ export default class ProductsController {
 
       user.useTransaction(trx)
 
-      const { description, discount, price, title, images, categoryId, subcategoryId } = await request.validate(StoreValidator)
+      const { description, price, title, images, subcategoryId } = await request.validate(StoreValidator)
 
       // crate product
+
+      const subcategoryIdNumber = Number(subcategoryId)
 
       const numberPrice = Number(price)
 
       const product = await user.related('products').create({
         description: description,
-        discount: discount,
         price: numberPrice,
         title: title,
-        productCategoryId: categoryId,
-        subcategoryId: subcategoryId
+        subcategoryId: subcategoryIdNumber
       })
 
       // save product images in files table, in aws and in local paste
@@ -86,7 +86,7 @@ export default class ProductsController {
 
     const loggedUser = auth.user!
 
-    const { description, discount, price, title, images, imagesDelete, categoryId, subcategoryId } = await request.validate(UpdateValidator)
+    const { description, price, title, images, imagesDelete, subcategoryId } = await request.validate(UpdateValidator)
 
     const numberPrice = Number(price)
 
@@ -94,13 +94,14 @@ export default class ProductsController {
       return response.unauthorized()
     }
 
+    const subcategoryIdNumber = Number(subcategoryId)
+
     await product.merge({
       description: description,
-      discount: discount,
+      previousPrice: product.price,
       title: title,
       price: numberPrice,
-      productCategoryId: categoryId,
-      subcategoryId: subcategoryId
+      subcategoryId: subcategoryIdNumber
     }).save()
 
     // save product images in files table, in aws and in local paste

@@ -8,7 +8,6 @@ export default class UpdateValidator {
   public schema = schema.create({
     title: schema.string({ trim: true }),
     price: schema.string({ trim: true }),
-    discount: schema.number.optional(),
     description: schema.string({ trim: true }),
     images: schema.array().members(schema.file.optional({
       size: '5mb',
@@ -28,8 +27,7 @@ export default class UpdateValidator {
       ],
     })),
     imagesDelete: schema.array().members(schema.string.optional()),
-    categoryId: schema.number([ rules.exists({ table: "product_categories", column: "id" })]),
-    subcategoryId: schema.number([ rules.exists({ table: "subcategories", column: "id" })])
+    subcategoryId: schema.string({ trim: true}, [ rules.exists({ table: "subcategories", column: "id" })])
   })
 
   public messages: CustomMessages = {}

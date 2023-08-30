@@ -12,11 +12,11 @@ import deleteProductImages from 'App/Utils/Functions/deleteProductImages';
 export default class ProductsController {
   public async index({ request }: HttpContextContract) {
 
-    const { search } = request.qs();
+    const { search, page, limit } = request.qs();
 
     const allProducts = await Product.query().if(search, (query) => {
       query.where('title', "ilike", `%${search}%`)
-    }).preload('files').preload("subcategory")
+    }).preload('files').preload("subcategory").paginate(page, limit)
 
     return allProducts
   }

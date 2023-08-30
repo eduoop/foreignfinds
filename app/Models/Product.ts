@@ -1,17 +1,7 @@
 import { DateTime } from 'luxon'
-import {
-  BaseModel,
-  BelongsTo,
-  HasMany,
-  HasOne,
-  belongsTo,
-  column,
-  hasMany,
-  hasOne,
-} from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import File from './File'
-import ProductCategory from './ProductCategory'
 import Subcategory from './Subcategory'
 
 export default class Product extends BaseModel {

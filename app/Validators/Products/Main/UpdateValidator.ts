@@ -9,25 +9,22 @@ export default class UpdateValidator {
     title: schema.string({ trim: true }),
     price: schema.string({ trim: true }),
     description: schema.string({ trim: true }),
-    images: schema.array().members(schema.file.optional({
+    images: schema.array.optional().members(schema.file.optional({
       size: '5mb',
       extnames: [
         'jpeg',
         'jpg',
         'png',
-        'gif',
         'svg',
-        'webp',
         'JPEG',
         'JPG',
         'PNG',
-        'GIF',
         'SVG',
-        'WEBP',
       ],
     })),
-    imagesDelete: schema.array().members(schema.string.optional()),
-    subcategoryId: schema.string({ trim: true}, [ rules.exists({ table: "subcategories", column: "id" })])
+    imagesDelete: schema.array.optional().members(schema.string.optional()),
+    subcategoryId: schema.string({ trim: true}, [ rules.exists({ table: "subcategories", column: "id" })]),
+    categoryId: schema.string({ trim: true}, [ rules.exists({ table: "product_categories", column: "id" })])
   })
 
   public messages: CustomMessages = {}

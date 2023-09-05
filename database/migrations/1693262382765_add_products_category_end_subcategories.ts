@@ -9,6 +9,13 @@ export default class extends BaseSchema {
       table
         .integer('subcategory_id')
         .unsigned()
+        .references('subcategories.id')
+        .onDelete('CASCADE')
+        .onUpdate('CASCADE')
+
+      table
+        .integer('product_category_id')
+        .unsigned()
         .references('product_categories.id')
         .onDelete('CASCADE')
         .onUpdate('CASCADE')

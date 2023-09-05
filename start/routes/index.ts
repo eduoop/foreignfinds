@@ -25,6 +25,8 @@ import './Users'
 import './Products'
 import './ProductsCategories'
 import './Subcategories'
+import './Sellers'
+import './RelatedAds'
 
 Route.get('/', async () => {
   return { hello: 'world' }

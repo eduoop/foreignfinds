@@ -27,11 +27,12 @@ export default class ProductsController {
 
       user.useTransaction(trx)
 
-      const { description, price, title, images, subcategoryId } = await request.validate(StoreValidator)
+      const { description, price, title, images, subcategoryId, categoryId } = await request.validate(StoreValidator)
 
       // crate product
 
       const subcategoryIdNumber = Number(subcategoryId)
+      const categoryIdNumber = Number(categoryId)
 
       const numberPrice = Number(price)
 
@@ -39,8 +40,9 @@ export default class ProductsController {
         description: description,
         price: numberPrice,
         title: title,
-        subcategoryId: subcategoryIdNumber
-      })
+        subcategoryId: subcategoryIdNumber,
+        productCategoryId: categoryIdNumber
+      }) 
 
       // save product images in files table, in aws and in local paste
 
@@ -74,13 +76,14 @@ export default class ProductsController {
   }
 
   public async show({ params }: HttpContextContract) {
-    const product = await Product.query().where('id', params.id).firstOrFail()
+    const product = await Product.query().where('id', params.id).preload("user", query => {
+      query.preload("avatar")
+    }).preload("files").preload("productCategory").preload("subcategory").firstOrFail()
 
     const productViews = product.views + 1;
 
     product.views = productViews
     await product.save()
-    await product.load('files')
 
     return product
   }
@@ -90,7 +93,7 @@ export default class ProductsController {
 
     const loggedUser = auth.user!
 
-    const { description, price, title, images, imagesDelete, subcategoryId } = await request.validate(UpdateValidator)
+    const { description, price, title, images, imagesDelete, subcategoryId, categoryId } = await request.validate(UpdateValidator)
 
     const numberPrice = Number(price)
 
@@ -99,60 +102,69 @@ export default class ProductsController {
     }
 
     const subcategoryIdNumber = Number(subcategoryId)
+    const categoryIdNumber = Number(categoryId)
 
     await product.merge({
       description: description,
-      previousPrice: product.price,
+      previousPrice: product.price !== Number(price) ? product.price : undefined,
       title: title,
       price: numberPrice,
-      subcategoryId: subcategoryIdNumber
+      subcategoryId: subcategoryIdNumber,
+      productCategoryId: categoryIdNumber
     }).save()
 
     // save product images in files table, in aws and in local paste
 
     const productExistsImages = await product.related('files').query()
 
-    if (productExistsImages.length + images.length > 5) {
-      return response.unauthorized("you only have 5 images")
-    }
-
-    await Promise.all(
-      images.map(async (image) => {
-        if (image) {
-          const imageId = faker.string.uuid()
-
-          const ProductImageUseCase = ProductImageFactory();
-
-          const imageUrl = await ProductImageUseCase.execute(image, imageId);
-
-          const saveImage = await product.related('files').create({
-            fileCategory: 'product_image',
-            fileName: `${imageId}.${image.extname}`,
-            fileUrl: imageUrl
-          })
-
-          await saveImage.save()
-
-          return imageUrl
+    if (images) {
+      if (imagesDelete) {
+        if (productExistsImages.length - imagesDelete.length + images.length > 6) {
+          return response.unauthorized("you only have 6 images")
         }
-      })
-    )
+      }
+
+      if (productExistsImages.length + images.length > 6) {
+        return response.unauthorized("you only have 6 images")
+      }
+
+      await Promise.all(
+        images.map(async (image) => {
+          if (image) {
+            const imageId = faker.string.uuid()
+
+            const ProductImageUseCase = ProductImageFactory();
+
+            const imageUrl = await ProductImageUseCase.execute(image, imageId);
+
+            const saveImage = await product.related('files').create({
+              fileCategory: 'product_image',
+              fileName: `${imageId}.${image.extname}`,
+              fileUrl: imageUrl
+            })
+
+            await saveImage.save()
+
+            return imageUrl
+          }
+        })
+      )
+    }
 
     // delete products images
 
     const local = "productsImages"
 
-    const filteredImagesDelete = imagesDelete.map((image) => {
-      return image !== null && image !== undefined && image
-    })
-
-
-    if (filteredImagesDelete) {
-      const images = await File.query().whereIn('file_name', filteredImagesDelete).andWhere('owner_id', product.id)
-      await deleteProductImages({ images: images, local: local })
+    if (imagesDelete) {
+      const filteredImagesDelete = await imagesDelete.map((image) => {
+        return image !== null && image !== undefined && image
+      })
+      if (filteredImagesDelete) {
+        const images = await File.query().whereIn('file_name', filteredImagesDelete).andWhere('owner_id', product.id)
+        await deleteProductImages({ images: images, local: local })
+      }
+      return response.status(200)
     }
-
-    return response.status(200)
   }
 
   public async destroy({ params, auth, response }: HttpContextContract) {
@@ -165,6 +177,8 @@ export default class ProductsController {
     await deleteProductImages({ images: productImages, local: local })
 
     const loggedUser = auth.user!
+
+    await product.delete()
 
     if (product.userId !== loggedUser.id && loggedUser.role !== 'admin') {
       return response.unauthorized()

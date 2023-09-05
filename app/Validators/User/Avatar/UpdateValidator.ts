@@ -7,20 +7,7 @@ export default class UpdateValidator {
   public schema = schema.create({
     file: schema.file({
       size: '5mb',
-      extnames: [
-        'jpeg',
-        'jpg',
-        'png',
-        'gif',
-        'svg',
-        'webp',
-        'JPEG',
-        'JPG',
-        'PNG',
-        'GIF',
-        'SVG',
-        'WEBP',
-      ],
+      extnames: ['jpeg', 'jpg', 'png', 'gif', 'svg', 'JPEG', 'JPG', 'PNG', 'SVG'],
     }),
   })
 

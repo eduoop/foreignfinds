@@ -19,15 +19,14 @@ export default class StoreValidator {
         'jpg',
         'png',
         'svg',
-        'webp',
         'JPEG',
         'JPG',
         'PNG',
         'SVG',
-        'WEBP',
       ],
     })),
-    subcategoryId: schema.string({ trim: true}, [ rules.exists({ table: "subcategories", column: "id" })])
+    subcategoryId: schema.string({ trim: true}, [ rules.exists({ table: "subcategories", column: "id" })]),
+    categoryId: schema.string({ trim: true}, [ rules.exists({ table: "product_categories", column: "id" })])
   })
 
   public messages: CustomMessages = {}

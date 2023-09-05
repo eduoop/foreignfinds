@@ -53,7 +53,7 @@ export default class UserRegister {
 
         const user = await userKey.related('user').query().firstOrFail()
 
-        const userSurname = user.name.split(' ')[0] ? user.name.split(' ')[0] : user.name
+        const userSurname = name.split(' ')[0] ? name.split(' ')[0] : name
 
         user.merge({ name: name, password: password, phone: phone, surname: userSurname})
 

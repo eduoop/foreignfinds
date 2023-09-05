@@ -12,3 +12,5 @@ Route.put('/users/forgot-password', 'Users/ForgotPassword.update')
 Route.put('/users/:id', 'Users/Main.update').middleware('auth')
 
 Route.put('/users-avatar', 'Users/Avatar.update').middleware('auth')
+
+Route.get('/users-ads', 'Users/Products.index').middleware('auth')

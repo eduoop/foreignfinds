@@ -3,6 +3,7 @@ import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:
 import User from './User'
 import File from './File'
 import Subcategory from './Subcategory'
+import ProductCategory from './ProductCategory'
 
 export default class Product extends BaseModel {
   @column({ isPrimary: true })
@@ -37,6 +38,9 @@ export default class Product extends BaseModel {
 
   @belongsTo(() => Subcategory)
   public subcategory: BelongsTo<typeof Subcategory>
+
+  @belongsTo(() => ProductCategory)
+  public productCategory: BelongsTo<typeof ProductCategory>
 
   @hasMany(() => File, {
     foreignKey: 'ownerId',

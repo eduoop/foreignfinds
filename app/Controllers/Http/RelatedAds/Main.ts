@@ -5,10 +5,30 @@ import Product from 'App/Models/Product'
 export default class RelatedAdsController {
   public async index({ request, params }: HttpContextContract) {
     const { id } = params
-    const { subcategoryId, limit } = request.qs()
+    const { subcategoryId, limit, currentAdPrice, adId } = request.qs()
 
-    const ads = Product.query().where("product_category_id", id).andWhere("subcategory_id", subcategoryId).preload("files").limit(limit)
+    const ads = await Product
+      .query()
+      .where("product_category_id", id)
+      .andWhere("subcategory_id", subcategoryId)
+      .andWhereNot("id", adId)
+      .preload("files")
+      .limit(limit)
 
-    return ads
+    const filteredAds = await Promise.all(
+      ads.map((ad) => {
+        const twentyPrice = (20 / 100) * ad.price
+
+        const moreTwentyPercent = ad.price + twentyPrice
+        const smallerTwentyPercent = ad.price - twentyPrice
+
+        if (moreTwentyPercent >= currentAdPrice && smallerTwentyPercent <= currentAdPrice) {
+          console.log(ad.title ? ad.title : "null")
+          return ad
+        }
+      })
+    )
+
+    return filteredAds
   }
 }

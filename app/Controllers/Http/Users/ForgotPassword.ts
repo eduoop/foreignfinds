@@ -21,7 +21,7 @@ export default class UserForgotPasswordController {
 
     await Mail.send((message) => {
       message.to(email)
-      message.from('contato@taxIr.com', 'taxIr')
+      message.from('foreingfinds@gmail.com', 'Foreignfinds')
       message.subject('Criação de conta')
       message.htmlView('emails/forgot-password', {
         link,

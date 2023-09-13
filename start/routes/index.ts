@@ -31,3 +31,7 @@ import './RelatedAds'
 Route.get('/', async () => {
   return { hello: 'world' }
 })
+
+Route.get("/change-status-mentor", async ({ view }) => {
+  return view.render("emails/forgot-password");
+});

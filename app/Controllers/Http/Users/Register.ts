@@ -31,7 +31,7 @@ export default class UserRegister {
 
             await Mail.send((message) => {
                 message.to(email)
-                message.from('contato@taxIr.com', 'taxIr')
+                message.from('foreingfinds@gmail.com', 'Foreingfinds')
                 message.subject('Criação de conta')
                 message.htmlView('emails/register', {
                     link,

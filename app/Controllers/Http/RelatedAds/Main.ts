@@ -23,7 +23,6 @@ export default class RelatedAdsController {
         const smallerTwentyPercent = ad.price - twentyPrice
 
         if (moreTwentyPercent >= currentAdPrice && smallerTwentyPercent <= currentAdPrice) {
-          console.log(ad.title ? ad.title : "null")
           return ad
         }
       })

@@ -11,7 +11,7 @@ export default class MainsController {
     return allCategories
   }
 
-  public async store({ auth, request }: HttpContextContract) {
+  public async store({ request }: HttpContextContract) {
     const { name } = await request.validate(StoreValidator)
 
 

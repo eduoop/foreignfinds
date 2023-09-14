@@ -29,8 +29,6 @@ export default class UserAvatarController {
 
                         // delete from temp
 
-                        // const imageExtname = avatar.fileName.split(".")[1]
-
                         const imageInLocal = await Application.tmpPath(`${local}/${avatar.fileName}`)
 
                         if (imageInLocal) {

@@ -17,33 +17,29 @@ export default class UserAvatarController {
 
             const user = auth.user!.useTransaction(trx)
 
-            const userAvatars = await user.related('avatar').query()
+            const userAvatar = await user.related('avatar').query().first()
 
             // delete old avatar
 
             const local = "avatars"
 
-            if (userAvatars.length > 0) {
-                await Promise.all(
-                    userAvatars.map(async (avatar) => {
+            if (userAvatar) {
 
-                        // delete from temp
+                // delete from temp
 
-                        const imageInLocal = await Application.tmpPath(`${local}/${avatar.fileName}`)
+                const imageInLocal = await Application.tmpPath(`${local}/${userAvatar.fileName}`)
 
-                        if (imageInLocal) {
-                            fs.unlink(imageInLocal)
-                        }
+                if (imageInLocal) {
+                    fs.unlink(imageInLocal)
+                }
 
 
-                        // delete from db
-                        await avatar.delete()
+                // delete from db
+                await userAvatar.delete()
 
-                        // delete from aws
+                // delete from aws
 
-                        await Drive.delete(`${local}/${avatar.fileName}`)
-                    })
-                )
+                await Drive.delete(`${local}/${userAvatar.fileName}`)
             }
 
             const fileId = faker.string.uuid()

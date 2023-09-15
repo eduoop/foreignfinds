@@ -30,4 +30,15 @@ export default class RelatedAdsController {
 
     return filteredAds
   }
+
+  public async show({ request, params }: HttpContextContract) {
+    const { id } = params
+    const { limit, adId } = request.qs()
+
+    const ads = await Product.query().where("userId", id).if(adId, (query) => {
+      query.andWhereNot("id", adId)
+    }).preload("files").limit(limit)
+
+    return ads
+  }
 }

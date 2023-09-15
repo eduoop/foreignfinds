@@ -33,7 +33,6 @@ export default class UserAvatarController {
                     fs.unlink(imageInLocal)
                 }
 
-
                 // delete from db
                 await userAvatar.delete()
 
@@ -56,7 +55,7 @@ export default class UserAvatarController {
                 fileUrl: imageUrl as any
             }
 
-            const avatar = await user.related('avatar').firstOrCreate(searchPayload, savePayload)
+            const avatar = await user.related('avatar').updateOrCreate(searchPayload, savePayload)
             avatar.save()
 
             return response.ok({ imageUrl });

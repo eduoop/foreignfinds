@@ -34,7 +34,7 @@ export default class UserRegister {
                 message.from('foreingfinds@gmail.com', 'Foreingfinds')
                 message.subject('Criação de conta')
                 message.htmlView('emails/register', {
-                    link,
+                    link
                 })
             })
         })

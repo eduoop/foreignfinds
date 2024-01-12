@@ -17,17 +17,17 @@ export default class UserRegister {
 
             user.useTransaction(trx)
 
-            user.email = email
+            user.email = email;
 
-            user.role = role
+            user.role = role;
 
-            await user.save()
+            await user.save();
 
-            const key = faker.string.uuid() + user.id
+            const key = faker.string.uuid() + user.id;
 
-            user.related('keys').create({ key })
+            user.related('keys').create({ key });
 
-            const link = `${redirectUrl.replace(/\/$/, '')}/${key}`
+            const link = `${redirectUrl.replace(/\/$/, '')}/${key}`;
 
             await Mail.send((message) => {
                 message.to(email)
